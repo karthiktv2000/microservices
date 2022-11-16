@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  #mongodb services
+  mongo_db:
+    container_name: mongo_db
+    image: mongo:latest
+    restart: always
+    #environment:
+    #MONGO_INITDB_ROOT_USERNAME: root
+    #MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    ports:
+      - 27017:27017
+
+  leave:
+    build: ./leave-microservice
+    #ports:
+    #- 3001:3001
+    environment:
+      PORT: 3001
+      #MONGODB_URI: mongodb://mongo_db:27017/Leave
+      DB_HOST: mongo_db
+      USER_HOST: user
+      LEAVE_HOST: leave
+    depends_on:
+      - user
+      - mongo_db
+
+  user:
+    build: ./user-microservice
+    ports:
+      - 3000:3000
+    environment:
+      PORT: 3000
+      #MONGODB_URI: mongodb://mongo_db:27017/User
+      DB_HOST: mongo_db:27017
+      USER_HOST: user
+      LEAVE_HOST: leave
+    depends_on:
+      - mongo_db
